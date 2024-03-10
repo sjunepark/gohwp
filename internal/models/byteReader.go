@@ -113,6 +113,14 @@ func (br *ByteReader) ReadStruct(data interface{}) error {
 	return nil
 }
 
+func (br *ByteReader) Skip(n int) error {
+	if br.offset+n > len(br.Data) {
+		return &OutOfBoundsError{Requested: br.offset + n, Max: len(br.Data)}
+	}
+	br.offset += n
+	return nil
+}
+
 func (br *ByteReader) IsEOF() bool {
 	return br.offset >= len(br.Data)
 }

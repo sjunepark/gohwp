@@ -6,6 +6,7 @@ import (
 	"github.com/sjunepark/gohwp/internal/docInfo"
 	"github.com/sjunepark/gohwp/internal/hwp"
 	"github.com/sjunepark/gohwp/internal/models"
+	"github.com/sjunepark/gohwp/internal/section"
 	"os"
 	"strings"
 )
@@ -28,8 +29,10 @@ func Parse(filePath string) error {
 	}
 
 	doc := &hwp.HWPDocument{}
-
 	documentData, err := getDocumentData(reader)
+	if err != nil {
+		return err
+	}
 
 	h, err := getHeader(documentData.header)
 	if err != nil {
@@ -61,7 +64,7 @@ type documentData struct {
 type sectionData []byte
 
 func getDocumentData(reader *mscfb.Reader) (*documentData, error) {
-	d := &documentData{}
+	dd := &documentData{}
 
 	for entry, err := reader.Next(); err == nil; entry, err = reader.Next() {
 		entryName := entry.Name
@@ -71,23 +74,23 @@ func getDocumentData(reader *mscfb.Reader) (*documentData, error) {
 			if err != nil {
 				return nil, err
 			}
-			d.header = data
+			dd.header = data
 		case entryName == "DocInfo":
 			data, err := getData(reader, entry.Size)
 			if err != nil {
 				return nil, err
 			}
-			d.docInfo = data
+			dd.docInfo = data
 		// Starts with Section
 		case strings.HasPrefix(entryName, "Section"):
 			data, err := getData(reader, entry.Size)
 			if err != nil {
 				return nil, err
 			}
-			d.bodyText = append(d.bodyText, data)
+			dd.bodyText = append(dd.bodyText, data)
 		}
 	}
-	return d, nil
+	return dd, nil
 }
 
 func getData(reader *mscfb.Reader, size int64) ([]byte, error) {
@@ -111,7 +114,7 @@ func getHeader(data []byte) (*models.HWPHeader, error) {
 	}
 
 	supportedVersion := models.HWPVersion{Major: 5, Minor: 0}
-	if header.Version.IsCompatible(supportedVersion) == false {
+	if !header.Version.IsCompatible(supportedVersion) {
 		return nil, fmt.Errorf("unsupported version: %s", header.Version)
 	}
 	return header, nil
@@ -135,12 +138,25 @@ func getDocInfo(data []byte) (*docInfo.DocInfo, error) {
 	return di, nil
 }
 
-func getSections(data []sectionData) ([]*models.Section, error) {
-	sections := make([]*models.Section, len(data))
+func getSections(data []sectionData) ([]*section.Section, error) {
+	sections := make([]*section.Section, len(data))
 	for _, sectionData := range data {
-		// todo: parse sectionData
-		// todo: append section to sections
-		fmt.Println(sectionData)
+		deCompressedData, err := DecompressDeflate(sectionData)
+		if err != nil {
+			return nil, err
+		}
+
+		sectionParser, err := section.NewParser(deCompressedData)
+		if err != nil {
+			return nil, err
+		}
+
+		s, err := sectionParser.Parse()
+		if err != nil {
+			return nil, err
+		}
+
+		sections = append(sections, s)
 	}
 	return sections, nil
 }

@@ -12,10 +12,3 @@ type DocInfo struct {
 	CompatibleDocument  int
 	LayoutCompatibility models.LayoutCompatibility
 }
-
-func (d *DocInfo) GetCharShape(index int) *models.CharShape {
-	if index < len(d.CharShapes) {
-		return &d.CharShapes[index]
-	}
-	return nil
-}

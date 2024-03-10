@@ -16,7 +16,6 @@ func NewParser(data []byte) (*Parser, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &Parser{record: *record, docInfo: &DocInfo{}}, nil
 }
 

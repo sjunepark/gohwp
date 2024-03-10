@@ -25,22 +25,19 @@ func ParseRecordTree(data []byte) (*Record, error) {
 		Children: []*Record{},
 	}
 
-	stack := []*Record{rootRecord}
-
 	for !br.IsEOF() {
 		record, err := br.ReadRecord()
 		if err != nil {
 			return nil, err
 		}
 
-		// Pop from the stack until we find the correct parent level, and get the parent
-		for len(stack) > 1 && stack[len(stack)-1].Level <= record.Level {
-			stack = stack[:len(stack)-1]
+		parent := rootRecord
+
+		for i := uint32(0); i < record.Level; i++ {
+			parent = parent.Children[len(parent.Children)-1]
 		}
-		parent := stack[len(stack)-1]
 
 		parent.Children = append(parent.Children, record)
-		stack = append(stack, record)
 	}
 
 	return rootRecord, nil
