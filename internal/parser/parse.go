@@ -28,59 +28,76 @@ func Parse(filePath string) error {
 
 	doc := &hwp.HWPDocument{}
 
+	h, err := getHeader(reader)
+	if err != nil {
+		return err
+	}
+	doc.Header = h
+
+	di, err := getDocInfo(reader)
+	if err != nil {
+		return err
+	}
+	doc.DocInfo = di
+
+	return nil
+}
+
+func getHeader(reader *mscfb.Reader) (*models.HWPHeader, error) {
 	for entry, err := reader.Next(); err == nil; entry, err = reader.Next() {
-		switch entry.Name {
-		case "FileHeader":
+		if entry.Name == "FileHeader" {
 			headerData := make([]byte, entry.Size)
 			_, err := reader.Read(headerData)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			header, err := models.NewHWPHeader(headerData)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			supportedSignature := "HWP Document File"
 			if header.Signature != supportedSignature {
-				return fmt.Errorf("unsupported signature: %s", header.Signature)
+				return nil, fmt.Errorf("unsupported signature: %s", header.Signature)
 			}
 
 			supportedVersion := models.HWPVersion{Major: 5, Minor: 0}
 			if header.Version.IsCompatible(supportedVersion) == false {
-				return fmt.Errorf("unsupported version: %s", header.Version)
+				return nil, fmt.Errorf("unsupported version: %s", header.Version)
 			}
+			return header, nil
+		}
+	}
+	return nil, fmt.Errorf("FileHeader not found")
+}
 
-			doc.Header = header
-		case "DocInfo":
+func getDocInfo(reader *mscfb.Reader) (*docInfo.DocInfo, error) {
+	for entry, err := reader.Next(); err == nil; entry, err = reader.Next() {
+		if entry.Name == "DocInfo" {
 			docInfoData := make([]byte, entry.Size)
 			_, err := reader.Read(docInfoData)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
-			// Raw deflate al
+			// Raw deflate algorithm
 			deCompressedData, err := DecompressDeflate(docInfoData)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			docInfoParser, err := docInfo.NewParser(deCompressedData)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			di, err := docInfoParser.Parse()
 			if err != nil {
-				return err
+				return nil, err
 			}
-
-			//	todo: remove
-			fmt.Println(di)
+			return di, nil
 		}
-
 	}
-
-	return nil
+	return nil, fmt.Errorf("DocInfo not found")
 }
