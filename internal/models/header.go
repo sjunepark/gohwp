@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type HWPHeader struct {
 	Version     HWPVersion   `validate:"required"`
@@ -22,7 +25,7 @@ func NewHWPHeader(data []byte) (*HWPHeader, error) {
 	header := &HWPHeader{}
 	var err error
 
-	header.Signature = string(data[:32])
+	header.Signature = strings.Trim(string(data[:32]), "\x00")
 	header.Version, err = NewHWPVersion(data[32:36])
 	if err != nil {
 		return nil, err

@@ -9,9 +9,6 @@ import (
 	"os"
 )
 
-var signature = "Hwp Document File"
-var supportedVersion = models.HWPVersion{Major: 5, Minor: 1}
-
 func Parse(filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -43,6 +40,16 @@ func Parse(filePath string) error {
 			header, err := models.NewHWPHeader(headerData)
 			if err != nil {
 				return err
+			}
+
+			supportedSignature := "HWP Document File"
+			if header.Signature != supportedSignature {
+				return fmt.Errorf("unsupported signature: %s", header.Signature)
+			}
+
+			supportedVersion := models.HWPVersion{Major: 5, Minor: 0}
+			if header.Version.IsCompatible(supportedVersion) == false {
+				return fmt.Errorf("unsupported version: %s", header.Version)
 			}
 
 			doc.Header = header
