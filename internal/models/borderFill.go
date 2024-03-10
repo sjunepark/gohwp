@@ -1,4 +1,8 @@
-package types
+package models
+
+import (
+	"github.com/sjunepark/gohwp/internal/types"
+)
 
 type BorderFillStyle struct {
 	Left   BorderStyle
@@ -10,7 +14,7 @@ type BorderFillStyle struct {
 type BorderStyle struct {
 	Type  int
 	Width int
-	Color ColorRef
+	Color types.ColorRef
 }
 
 type BorderFill struct {
@@ -18,5 +22,5 @@ type BorderFill struct {
 	Attribute int
 	Style     BorderFillStyle
 	// todo: implement gradation
-	BackgroundColor *ColorRef
+	BackgroundColor *types.ColorRef
 }

@@ -1,4 +1,8 @@
-package types
+package models
+
+import (
+	"github.com/sjunepark/gohwp/internal/types"
+)
 
 type CharShape struct {
 	FontId           SupportedLocaleOptions
@@ -8,14 +12,14 @@ type CharShape struct {
 	FontLocation     SupportedLocaleOptions
 	FontBaseSize     float64
 	Attr             int
-	Shadow           ColorRef
-	Shadow2          ColorRef
-	Color            ColorRef
-	UnderLineColor   ColorRef
-	ShadeColor       ColorRef
-	ShadowColor      ColorRef
+	Shadow           types.ColorRef
+	Shadow2          types.ColorRef
+	Color            types.ColorRef
+	UnderLineColor   types.ColorRef
+	ShadeColor       types.ColorRef
+	ShadowColor      types.ColorRef
 	FontBackgroundId *int
-	StrikeColor      *ColorRef
+	StrikeColor      *types.ColorRef
 }
 
 func NewCharShape(

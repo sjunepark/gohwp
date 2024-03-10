@@ -1,4 +1,4 @@
-package types
+package models
 
 type binDataType int
 
@@ -31,7 +31,7 @@ type binProperties struct {
 	status      binDataStatus
 }
 
-type binData struct {
+type BinData struct {
 	properties binProperties
 	extension  string
 	payload    []byte

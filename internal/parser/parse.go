@@ -3,12 +3,14 @@ package parser
 import (
 	"fmt"
 	"github.com/richardlehane/mscfb"
-	"github.com/sjunepark/gohwp/internal/types"
+	"github.com/sjunepark/gohwp/internal/docInfo"
+	"github.com/sjunepark/gohwp/internal/hwp"
+	"github.com/sjunepark/gohwp/internal/models"
 	"os"
 )
 
 var signature = "Hwp Document File"
-var supportedVersion = types.HWPVersion{Major: 5, Minor: 1}
+var supportedVersion = models.HWPVersion{Major: 5, Minor: 1}
 
 func Parse(filePath string) error {
 	file, err := os.Open(filePath)
@@ -27,7 +29,7 @@ func Parse(filePath string) error {
 		return err
 	}
 
-	doc := &types.HWPDocument{}
+	doc := &hwp.HWPDocument{}
 
 	for entry, err := reader.Next(); err == nil; entry, err = reader.Next() {
 		switch entry.Name {
@@ -38,7 +40,7 @@ func Parse(filePath string) error {
 				return err
 			}
 
-			header, err := types.NewHWPHeader(headerData)
+			header, err := models.NewHWPHeader(headerData)
 			if err != nil {
 				return err
 			}
@@ -57,18 +59,18 @@ func Parse(filePath string) error {
 				return err
 			}
 
-			docInfoParser, err := NewDocInfoParser(deCompressedData)
+			docInfoParser, err := docInfo.NewParser(deCompressedData)
 			if err != nil {
 				return err
 			}
 
-			docInfo, err := docInfoParser.Parse()
+			di, err := docInfoParser.Parse()
 			if err != nil {
 				return err
 			}
 
 			//	todo: remove
-			fmt.Println(docInfo)
+			fmt.Println(di)
 		}
 
 	}
