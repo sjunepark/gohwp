@@ -43,12 +43,12 @@ func (ph *ParaHeaderV1) String() string {
 		ph.TextLength, ph.ControlMask, ph.ParaShapeIDRef, ph.ParaStyleIDRef, ph.DivisionType.String(), ph.CharShapeInfoCnt, ph.RangeTagInfoCnt, ph.AlignInfoCnt, ph.ParaInstanceID)
 }
 
-type ParaHeaderV2 struct {
+type ParaHeader struct {
 	ParaHeaderV1
 	IsMergedTrack *uint16
 }
 
-func (ph *ParaHeaderV2) String() string {
+func (ph *ParaHeader) String() string {
 	phV1 := ph.ParaHeaderV1.String()
 	var trackInfo string
 	if ph.IsMergedTrack != nil {

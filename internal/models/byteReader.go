@@ -97,20 +97,20 @@ func (br *ByteReader) readDword() (Dword, error) {
 	return dword, nil
 }
 
-func (br *ByteReader) ReadStruct(data interface{}) error {
+func (br *ByteReader) ReadStruct(data interface{}) (int, error) {
 	size := binary.Size(data)
 	if br.offset+size > len(br.Data) {
-		return &types.OutOfBoundsError{Requested: br.offset + size, Max: len(br.Data)}
+		return 0, &types.OutOfBoundsError{Requested: br.offset + size, Max: len(br.Data)}
 	}
 
 	reader := bytes.NewReader(br.Data[br.offset : br.offset+size])
 	err := binary.Read(reader, binary.LittleEndian, data)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	br.offset += size
-	return nil
+	return br.offset, nil
 }
 
 func (br *ByteReader) Skip(n int) error {

@@ -1,6 +1,7 @@
 package models
 
 type Paragraph struct {
-	text []HWPChar
+	ParaHeader *ParaHeader
+	ParaText   ParaText
 	// todo: implement other properties
 }

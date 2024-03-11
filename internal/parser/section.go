@@ -8,7 +8,7 @@ import (
 )
 
 type SectionParser struct {
-	reader  *models.Record
+	record  *models.Record
 	section *models.Section
 }
 
@@ -17,11 +17,11 @@ func NewSectionParser(data []byte) (*SectionParser, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SectionParser{reader: record, section: &models.Section{}}, nil
+	return &SectionParser{record: record, section: &models.Section{}}, nil
 }
 
 func (p *SectionParser) Parse(ctx context.Context) (*models.Section, error) {
-	for _, child := range p.reader.Children {
+	for _, child := range p.record.Children {
 		err := visitSection(child, p.section, ctx)
 		if err != nil {
 			return nil, err
@@ -33,12 +33,12 @@ func (p *SectionParser) Parse(ctx context.Context) (*models.Section, error) {
 func visitSection(record *models.Record, section *models.Section, ctx context.Context) error {
 	switch record.TagID {
 	case constants.SECTION_HWPTAG_PARA_HEADER:
-		paraHeader, err := visitParHeader(record, section, ctx)
+		err := visitParHeader(record, section, ctx)
 		if err != nil {
 			return err
 		}
-		fmt.Println(paraHeader)
 	case constants.SECTION_HWPTAG_PARA_TEXT:
+		// CHECK: This visitParaText doesn't know where to append it's parsed paraText
 		paraText, err := visitParaText(record, section)
 		if err != nil {
 			return err
@@ -58,49 +58,59 @@ func visitSection(record *models.Record, section *models.Section, ctx context.Co
 	return nil
 }
 
-func visitParHeader(record *models.Record, section *models.Section, ctx context.Context) (*models.ParaHeaderV2, error) {
+func visitParHeader(record *models.Record, section *models.Section, ctx context.Context) error {
 	br := models.ByteReader{Data: record.Payload}
 
-	var paraHeader models.ParaHeaderV2
+	var paraHeader models.ParaHeader
 
 	hwpVersion, ok := getVersion(ctx)
 	if !ok {
-		return nil, fmt.Errorf("hwpVersion not found in context")
+		return fmt.Errorf("hwpVersion not found in context")
 	}
 	if (hwpVersion.Gte(models.HWPVersion{Major: 5, Build: 3, Revision: 2})) {
-		var paraHeaderV2 models.ParaHeaderV2
+		var paraHeaderV2 models.ParaHeader
 
-		err := br.ReadStruct(&paraHeaderV2)
+		_, err := br.ReadStruct(&paraHeaderV2)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		paraHeader = paraHeaderV2
 	} else {
 		var paraHeaderV1 models.ParaHeaderV1
 
-		err := br.ReadStruct(&paraHeaderV1)
+		_, err := br.ReadStruct(&paraHeaderV1)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		// Q: Fix this
-		paraHeader = models.ParaHeaderV2{ParaHeaderV1: paraHeaderV1, IsMergedTrack: nil}
+		paraHeader = models.ParaHeader{ParaHeaderV1: paraHeaderV1, IsMergedTrack: nil}
 	}
 
-	return &paraHeader, nil
+	// Initialize paragraph
+	paragraph := models.Paragraph{}
+	paragraph.ParaHeader = &paraHeader
+	section.Paragraphs = append(section.Paragraphs, &paragraph)
+
+	return nil
 }
 
 func visitParaText(record *models.Record, section *models.Section) (models.ParaText, error) {
 	// todo: implement paragraph size
-	br := models.ByteReader{Data: record.Payload}
+	br := models.ByteReader{Data: record.Payload} // Is size 80
+
+	currentPara := section.CurrentParagraph()
+	textLength := currentPara.ParaHeader.TextLength // Outputs 40
 
 	var paraText models.ParaText
+	var bytesRead int
 
-	for !br.IsEOF() {
+	for bytesRead <= int(textLength)*2 {
 		var wChar models.WChar
-		err := br.ReadStruct(&wChar)
+		offset, err := br.ReadStruct(&wChar)
 		if err != nil {
 			return nil, err
 		}
+		bytesRead += offset
 
 		charType := wChar.CharType()
 		if charType == models.CharTypeInline || charType == models.CharTypeExtended {
