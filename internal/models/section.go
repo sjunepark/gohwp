@@ -1,4 +1,4 @@
-package section
+package models
 
 type Section struct {
 	Width             uint32      `validate:"required"`

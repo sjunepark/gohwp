@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/sjunepark/gohwp/internal/types"
 )
 
 type HWPVersion struct {
@@ -16,7 +17,7 @@ func NewHWPVersion(data []byte) (HWPVersion, error) {
 	expectedLength := 4
 
 	if len(data) != expectedLength {
-		return HWPVersion{}, &ByteLengthError{
+		return HWPVersion{}, &types.ByteLengthError{
 			ExpectedLength: expectedLength,
 			ActualLength:   len(data),
 		}
@@ -34,6 +35,7 @@ func (v HWPVersion) IsCompatible(target HWPVersion) bool {
 	return v.Major == target.Major && v.Minor <= target.Minor
 }
 
+// Gte returns true if v is greater than or equal to target
 func (v HWPVersion) Gte(target HWPVersion) bool {
 	if v.Major != target.Major {
 		return v.Major > target.Major
@@ -74,7 +76,7 @@ type Attributes1 struct {
 
 func NewAttributes1(data []byte) (*Attributes1, error) {
 	if len(data) != 4 {
-		return nil, &ByteLengthError{
+		return nil, &types.ByteLengthError{
 			ExpectedLength: 4,
 			ActualLength:   len(data),
 		}

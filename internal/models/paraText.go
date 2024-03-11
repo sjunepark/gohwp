@@ -1,11 +1,10 @@
-package section
+package models
 
 import (
-	"github.com/sjunepark/gohwp/internal/types"
 	"unicode/utf16"
 )
 
-type ParaText []types.WChar
+type ParaText []WChar
 
 func (p *ParaText) String() string {
 	var uint16s []uint16

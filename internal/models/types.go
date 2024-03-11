@@ -1,4 +1,4 @@
-package types
+package models
 
 import (
 	"github.com/sjunepark/gohwp/internal/validator"
@@ -27,8 +27,8 @@ func NewColorRef(red, green, blue uint8) (ColorRef, error) {
 	return ColorRef{Red: red, Green: green, Blue: blue}, nil
 }
 
-func (wc WChar) GetCharType(char WChar) CharType {
-	switch char {
+func (wc WChar) CharType() CharType {
+	switch wc {
 	case 0: // 불가능한 문자(unusable char)
 		return CharTypeChar
 

@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/sjunepark/gohwp/internal/types"
 	"strings"
 )
 
@@ -16,7 +17,7 @@ func NewHWPHeader(data []byte) (*HWPHeader, error) {
 	expectedLength := 256
 
 	if len(data) != expectedLength {
-		return nil, &ByteLengthError{
+		return nil, &types.ByteLengthError{
 			ExpectedLength: expectedLength,
 			ActualLength:   len(data),
 		}

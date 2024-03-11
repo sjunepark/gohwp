@@ -1,15 +1,11 @@
 package models
 
-import (
-	"github.com/sjunepark/gohwp/internal/types"
-)
-
 func getBitValue(value int, start int, end int) uint8 {
 	return uint8((value >> start) & ((1 << (end - start + 1)) - 1))
 }
 
-func getRGB(colorRef int) types.ColorRef {
-	return types.ColorRef{
+func getRGB(colorRef int) ColorRef {
+	return ColorRef{
 		Red:   getBitValue(colorRef, 0, 7),
 		Green: getBitValue(colorRef, 8, 15),
 		Blue:  getBitValue(colorRef, 16, 23),

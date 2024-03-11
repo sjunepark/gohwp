@@ -1,4 +1,4 @@
-package docInfo
+package parser
 
 import (
 	"fmt"
@@ -6,22 +6,22 @@ import (
 	"github.com/sjunepark/gohwp/internal/models"
 )
 
-type Parser struct {
+type DocInfoParser struct {
 	record  models.Record
-	docInfo *DocInfo
+	docInfo *models.DocInfo
 }
 
-func NewParser(data []byte) (*Parser, error) {
+func NewDocInfoParser(data []byte) (*DocInfoParser, error) {
 	record, err := models.ParseRecordTree(data)
 	if err != nil {
 		return nil, err
 	}
-	return &Parser{record: *record, docInfo: &DocInfo{}}, nil
+	return &DocInfoParser{record: *record, docInfo: &models.DocInfo{}}, nil
 }
 
-func (p *Parser) Parse() (*DocInfo, error) {
+func (p *DocInfoParser) Parse() (*models.DocInfo, error) {
 	for _, child := range p.record.Children {
-		err := visit(child, p.docInfo)
+		err := visitDocInfo(child, p.docInfo)
 		if err != nil {
 			return nil, err
 		}
@@ -29,7 +29,7 @@ func (p *Parser) Parse() (*DocInfo, error) {
 	return p.docInfo, nil
 }
 
-func visit(record *models.Record, docInfo *DocInfo) error {
+func visitDocInfo(record *models.Record, docInfo *models.DocInfo) error {
 	switch record.TagID {
 	case constants.DOCINFO_HWPTAG_DOCUMENT_PROPERTIES:
 		err := visitDocumentProperties(record, docInfo)
@@ -42,7 +42,7 @@ func visit(record *models.Record, docInfo *DocInfo) error {
 	}
 
 	for _, child := range record.Children {
-		err := visit(child, docInfo)
+		err := visitDocInfo(child, docInfo)
 		if err != nil {
 			return err
 		}
@@ -50,8 +50,8 @@ func visit(record *models.Record, docInfo *DocInfo) error {
 	return nil
 }
 
-func visitDocumentProperties(record *models.Record, docInfo *DocInfo) error {
-	dp := &DocumentProperties{}
+func visitDocumentProperties(record *models.Record, docInfo *models.DocInfo) error {
+	dp := &models.DocumentProperties{}
 	br := models.ByteReader{Data: record.Payload}
 	err := br.ReadStruct(dp)
 	if err != nil {

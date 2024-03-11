@@ -1,12 +1,10 @@
 package parser
 
 import (
+	"context"
 	"fmt"
 	"github.com/richardlehane/mscfb"
-	"github.com/sjunepark/gohwp/internal/docInfo"
-	"github.com/sjunepark/gohwp/internal/hwp"
 	"github.com/sjunepark/gohwp/internal/models"
-	"github.com/sjunepark/gohwp/internal/section"
 	"os"
 	"strings"
 )
@@ -28,7 +26,7 @@ func Parse(filePath string) error {
 		return err
 	}
 
-	doc := &hwp.HWPDocument{}
+	doc := &models.HWPDocument{}
 	documentData, err := getDocumentData(reader)
 	if err != nil {
 		return err
@@ -39,6 +37,8 @@ func Parse(filePath string) error {
 		return err
 	}
 	doc.Header = h
+	ctx := context.Background()
+	WithVersion(ctx, h.Version)
 
 	di, err := getDocInfo(documentData.docInfo)
 	if err != nil {
@@ -46,7 +46,7 @@ func Parse(filePath string) error {
 	}
 	doc.DocInfo = di
 
-	s, err := getSections(documentData.bodyText)
+	s, err := getSections(documentData.bodyText, ctx)
 	if err != nil {
 		return err
 	}
@@ -113,20 +113,20 @@ func getHeader(data []byte) (*models.HWPHeader, error) {
 		return nil, fmt.Errorf("unsupported signature: %s", header.Signature)
 	}
 
-	supportedVersion := models.HWPVersion{Major: 5, Minor: 0}
+	supportedVersion := models.HWPVersion{Major: 5}
 	if !header.Version.IsCompatible(supportedVersion) {
 		return nil, fmt.Errorf("unsupported version: %s", header.Version)
 	}
 	return header, nil
 }
 
-func getDocInfo(data []byte) (*docInfo.DocInfo, error) {
+func getDocInfo(data []byte) (*models.DocInfo, error) {
 	deCompressedData, err := DecompressDeflate(data)
 	if err != nil {
 		return nil, err
 	}
 
-	docInfoParser, err := docInfo.NewParser(deCompressedData)
+	docInfoParser, err := NewDocInfoParser(deCompressedData)
 	if err != nil {
 		return nil, err
 	}
@@ -138,20 +138,20 @@ func getDocInfo(data []byte) (*docInfo.DocInfo, error) {
 	return di, nil
 }
 
-func getSections(data []sectionData) ([]*section.Section, error) {
-	sections := make([]*section.Section, len(data))
+func getSections(data []sectionData, ctx context.Context) ([]*models.Section, error) {
+	sections := make([]*models.Section, len(data))
 	for _, sectionData := range data {
 		deCompressedData, err := DecompressDeflate(sectionData)
 		if err != nil {
 			return nil, err
 		}
 
-		sectionParser, err := section.NewParser(deCompressedData)
+		sectionParser, err := NewSectionParser(deCompressedData)
 		if err != nil {
 			return nil, err
 		}
 
-		s, err := sectionParser.Parse()
+		s, err := sectionParser.Parse(ctx)
 		if err != nil {
 			return nil, err
 		}
