@@ -7,11 +7,11 @@ import (
 
 const versionKey = "hwpVersion"
 
-func WithVersion(ctx context.Context, version models.HWPVersion) context.Context {
+func setVersion(ctx context.Context, version models.HWPVersion) context.Context {
 	return context.WithValue(ctx, versionKey, version)
 }
 
-func VersionFromContext(ctx context.Context) (models.HWPVersion, bool) {
-	version, ok := ctx.Value(versionKey).(models.HWPVersion)
-	return version, ok
+func getVersion(ctx context.Context) (models.HWPVersion, bool) {
+	v, ok := ctx.Value(versionKey).(models.HWPVersion)
+	return v, ok
 }

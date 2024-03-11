@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"github.com/sjunepark/gohwp/internal/constants"
 	"github.com/sjunepark/gohwp/internal/models"
 )
@@ -37,7 +36,6 @@ func visitDocInfo(record *models.Record, docInfo *models.DocInfo) error {
 			return err
 		}
 	default:
-		fmt.Println("Unimplemented tag:", record.TagID)
 		return nil
 	}
 

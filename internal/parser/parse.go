@@ -38,7 +38,7 @@ func Parse(filePath string) error {
 	}
 	doc.Header = h
 	ctx := context.Background()
-	WithVersion(ctx, h.Version)
+	ctx = setVersion(ctx, h.Version)
 
 	di, err := getDocInfo(documentData.docInfo)
 	if err != nil {

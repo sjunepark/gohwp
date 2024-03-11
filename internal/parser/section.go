@@ -31,7 +31,6 @@ func (p *SectionParser) Parse(ctx context.Context) (*models.Section, error) {
 }
 
 func visitSection(record *models.Record, section *models.Section, ctx context.Context) error {
-	fmt.Println("TagID:", record.TagID)
 	switch record.TagID {
 	case constants.SECTION_HWPTAG_PARA_HEADER:
 		paraHeader, err := visitParHeader(record, section, ctx)
@@ -45,9 +44,8 @@ func visitSection(record *models.Record, section *models.Section, ctx context.Co
 			return err
 		}
 		// todo: remove
-		fmt.Println(paraText.String())
+		fmt.Println((&paraText).String())
 	default:
-		fmt.Println("Unimplemented tag:", record.TagID)
 		return nil
 	}
 
@@ -65,7 +63,7 @@ func visitParHeader(record *models.Record, section *models.Section, ctx context.
 
 	var paraHeader models.ParaHeader
 
-	hwpVersion, ok := VersionFromContext(ctx)
+	hwpVersion, ok := getVersion(ctx)
 	if !ok {
 		return nil, fmt.Errorf("hwpVersion not found in context")
 	}
