@@ -120,6 +120,6 @@ func visitParaText(record *models.Record, section *models.Section) error {
 		paraText = append(paraText, wChar)
 	}
 
-	section.CurrentParagraph().ParaText = &paraText
+	section.CurrentParagraph().ParaText = paraText
 	return nil
 }
