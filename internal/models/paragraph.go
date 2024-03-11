@@ -2,6 +2,6 @@ package models
 
 type Paragraph struct {
 	ParaHeader *ParaHeader
-	ParaText   ParaText
+	ParaText   *ParaText
 	// todo: implement other properties
 }

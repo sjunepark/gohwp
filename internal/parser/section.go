@@ -39,12 +39,10 @@ func visitSection(record *models.Record, section *models.Section, ctx context.Co
 		}
 	case constants.SECTION_HWPTAG_PARA_TEXT:
 		// CHECK: This visitParaText doesn't know where to append it's parsed paraText
-		paraText, err := visitParaText(record, section)
+		err := visitParaText(record, section)
 		if err != nil {
 			return err
 		}
-		// todo: remove
-		fmt.Println((&paraText).String())
 	default:
 		return nil
 	}
@@ -94,7 +92,7 @@ func visitParHeader(record *models.Record, section *models.Section, ctx context.
 	return nil
 }
 
-func visitParaText(record *models.Record, section *models.Section) (models.ParaText, error) {
+func visitParaText(record *models.Record, section *models.Section) error {
 	// todo: implement paragraph size
 	br := models.ByteReader{Data: record.Payload} // Is size 80
 
@@ -108,7 +106,7 @@ func visitParaText(record *models.Record, section *models.Section) (models.ParaT
 		var wChar models.WChar
 		offset, err := br.ReadStruct(&wChar)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		bytesRead += offset
 
@@ -116,11 +114,12 @@ func visitParaText(record *models.Record, section *models.Section) (models.ParaT
 		if charType == models.CharTypeInline || charType == models.CharTypeExtended {
 			err = br.Skip(14)
 			if err != nil {
-				return nil, err
+				return err
 			}
 		}
 		paraText = append(paraText, wChar)
 	}
 
-	return paraText, nil
+	section.CurrentParagraph().ParaText = &paraText
+	return nil
 }
