@@ -58,10 +58,10 @@ func visitSection(record *models.Record, section *models.Section, ctx context.Co
 	return nil
 }
 
-func visitParHeader(record *models.Record, section *models.Section, ctx context.Context) (*models.ParaHeader, error) {
+func visitParHeader(record *models.Record, section *models.Section, ctx context.Context) (*models.ParaHeaderV2, error) {
 	br := models.ByteReader{Data: record.Payload}
 
-	var paraHeader models.ParaHeader
+	var paraHeader models.ParaHeaderV2
 
 	hwpVersion, ok := getVersion(ctx)
 	if !ok {
@@ -82,7 +82,8 @@ func visitParHeader(record *models.Record, section *models.Section, ctx context.
 		if err != nil {
 			return nil, err
 		}
-		paraHeader = paraHeaderV1
+		// Q: Fix this
+		paraHeader = models.ParaHeaderV2{ParaHeaderV1: paraHeaderV1, IsMergedTrack: nil}
 	}
 
 	return &paraHeader, nil
