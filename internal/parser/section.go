@@ -27,6 +27,7 @@ func (p *SectionParser) Parse(ctx context.Context) (*models.Section, error) {
 			return nil, err
 		}
 	}
+	fmt.Println(p.section)
 	return p.section, nil
 }
 
@@ -37,26 +38,17 @@ func visitSection(record *models.Record, section *models.Section, ctx context.Co
 		if err != nil {
 			return err
 		}
-	case constants.SECTION_HWPTAG_PARA_TEXT:
-		// CHECK: This visitParaText doesn't know where to append it's parsed paraText
-		err := visitParaText(record, section)
-		if err != nil {
-			return err
-		}
 	default:
 		return nil
 	}
 
-	for _, child := range record.Children {
-		err := visitSection(child, section, ctx)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
 func visitParHeader(record *models.Record, section *models.Section, ctx context.Context) error {
+	if record.Level != 0 {
+		return fmt.Errorf("invalid level: %d", record.Level)
+	}
 	br := models.ByteReader{Data: record.Payload}
 
 	var paraHeader models.ParaHeader
@@ -89,26 +81,47 @@ func visitParHeader(record *models.Record, section *models.Section, ctx context.
 	paragraph.ParaHeader = &paraHeader
 	section.Paragraphs = append(section.Paragraphs, &paragraph)
 
+	for _, child := range record.Children {
+		err := visitParaElem(child, section, ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func visitParaElem(record *models.Record, section *models.Section, ctx context.Context) error {
+	switch record.TagID {
+	case constants.SECTION_HWPTAG_PARA_TEXT:
+		err := visitParaText(record, section)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
 func visitParaText(record *models.Record, section *models.Section) error {
-	// todo: implement paragraph size
+	if record.Level != 1 {
+		return fmt.Errorf("invalid level: %d", record.Level)
+	}
 	br := models.ByteReader{Data: record.Payload} // Is size 80
 
 	currentPara := section.CurrentParagraph()
 	textLength := currentPara.ParaHeader.TextLength // Outputs 40
 
 	var paraText models.ParaText
-	var bytesRead int
+	var processedBytes int
+	const textBytes = 2
 
-	for bytesRead <= int(textLength)*2 {
+	for processedBytes <= int(textLength)*textBytes {
 		var wChar models.WChar
 		offset, err := br.ReadStruct(&wChar)
 		if err != nil {
 			return err
 		}
-		bytesRead += offset
+		processedBytes += offset
 
 		charType := wChar.CharType()
 		if charType == models.CharTypeInline || charType == models.CharTypeExtended {
