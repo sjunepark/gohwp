@@ -1,6 +1,6 @@
 package model
 
-type HWPDocument struct {
+type Document struct {
 	Header   *HWPHeader
 	DocInfo  *DocInfo
 	BodyText []*Section

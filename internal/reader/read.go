@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-func Read(filePath string) (doc *model.HWPDocument, encrypted bool, err error) {
+func Read(filePath string) (doc *model.Document, encrypted bool, err error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return &model.HWPDocument{}, false, err
+		return &model.Document{}, false, err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
@@ -23,19 +23,19 @@ func Read(filePath string) (doc *model.HWPDocument, encrypted bool, err error) {
 
 	reader, err := mscfb.New(file)
 	if err != nil {
-		return &model.HWPDocument{}, false, err
+		return &model.Document{}, false, err
 	}
 
-	doc = &model.HWPDocument{}
+	doc = &model.Document{}
 
 	documentData, err := getDocumentData(reader)
 	if err != nil {
-		return &model.HWPDocument{}, false, err
+		return &model.Document{}, false, err
 	}
 
 	header, err := getHeader(documentData.header)
 	if err != nil {
-		return &model.HWPDocument{}, false, err
+		return &model.Document{}, false, err
 	}
 	doc.Header = header
 	ctx := context.Background()
@@ -44,18 +44,18 @@ func Read(filePath string) (doc *model.HWPDocument, encrypted bool, err error) {
 	// todo: test if this works for encrypted documents
 	// Early return when document is ed
 	if header.Attributes1.Encrypted {
-		return &model.HWPDocument{}, false, err
+		return &model.Document{}, false, err
 	}
 
 	docInfo, err := getDocInfo(documentData.docInfo)
 	if err != nil {
-		return &model.HWPDocument{}, false, err
+		return &model.Document{}, false, err
 	}
 	doc.DocInfo = docInfo
 
 	sections, err := getSections(documentData.bodyText, ctx)
 	if err != nil {
-		return &model.HWPDocument{}, false, err
+		return &model.Document{}, false, err
 	}
 	doc.BodyText = sections
 
