@@ -1,8 +1,8 @@
 package reader
 
 import (
-	"github.com/sjunepark/gohwp/internal/constant"
-	"github.com/sjunepark/gohwp/internal/model"
+	"github.com/sjunepark/gohwp/internal/reader/constant"
+	"github.com/sjunepark/gohwp/internal/reader/model"
 )
 
 type DocInfoReader struct {
