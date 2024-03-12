@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	"github.com/sjunepark/gohwp/internal/parser"
+	"github.com/sjunepark/gohwp/internal/reader"
 	"log/slog"
 	"os"
 )
@@ -17,7 +17,7 @@ func init() {
 func main() {
 	initSlog()
 
-	err := parser.Parse("data/example.hwp")
+	err := reader.Read("data/example.hwp")
 	if err != nil {
 		fmt.Println(err)
 	}

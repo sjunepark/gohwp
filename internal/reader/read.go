@@ -1,4 +1,4 @@
-package parser
+package reader
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func Parse(filePath string) error {
+func Read(filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -126,12 +126,12 @@ func getDocInfo(data []byte) (*model.DocInfo, error) {
 		return nil, err
 	}
 
-	docInfoParser, err := NewDocInfoParser(deCompressedData)
+	docInfoReader, err := NewDocInfoReader(deCompressedData)
 	if err != nil {
 		return nil, err
 	}
 
-	di, err := docInfoParser.Parse()
+	di, err := docInfoReader.Read()
 	if err != nil {
 		return nil, err
 	}
@@ -146,12 +146,12 @@ func getSections(data []sectionData, ctx context.Context) ([]*model.Section, err
 			return nil, err
 		}
 
-		sectionParser, err := NewSectionParser(deCompressedData)
+		sectionReader, err := NewSectionReader(deCompressedData)
 		if err != nil {
 			return nil, err
 		}
 
-		s, err := sectionParser.Parse(ctx)
+		s, err := sectionReader.Read(ctx)
 		if err != nil {
 			return nil, err
 		}

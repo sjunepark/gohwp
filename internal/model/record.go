@@ -43,7 +43,7 @@ func (rh *RecordHeader) String() string {
 	return fmt.Sprintf("TagID: %s, Level: %d, Size: %d", rh.TagID, rh.Level, rh.Size)
 }
 
-func ParseRecordTree(data []byte) (*Record, error) {
+func ReadRecordTree(data []byte) (*Record, error) {
 	br := &ByteReader{Data: data}
 
 	rootRecord := &Record{

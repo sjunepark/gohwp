@@ -1,24 +1,24 @@
-package parser
+package reader
 
 import (
 	"github.com/sjunepark/gohwp/internal/constant"
 	"github.com/sjunepark/gohwp/internal/model"
 )
 
-type DocInfoParser struct {
+type DocInfoReader struct {
 	record  model.Record
 	docInfo *model.DocInfo
 }
 
-func NewDocInfoParser(data []byte) (*DocInfoParser, error) {
-	record, err := model.ParseRecordTree(data)
+func NewDocInfoReader(data []byte) (*DocInfoReader, error) {
+	record, err := model.ReadRecordTree(data)
 	if err != nil {
 		return nil, err
 	}
-	return &DocInfoParser{record: *record, docInfo: &model.DocInfo{}}, nil
+	return &DocInfoReader{record: *record, docInfo: &model.DocInfo{}}, nil
 }
 
-func (p *DocInfoParser) Parse() (*model.DocInfo, error) {
+func (p *DocInfoReader) Read() (*model.DocInfo, error) {
 	for _, child := range p.record.Children {
 		err := visitDocInfo(child, p.docInfo)
 		if err != nil {
