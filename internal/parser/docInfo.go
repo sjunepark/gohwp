@@ -51,7 +51,7 @@ func visitDocInfo(record *model.Record, docInfo *model.DocInfo) error {
 func visitDocumentProperties(record *model.Record, docInfo *model.DocInfo) error {
 	dp := &model.DocumentProperties{}
 	br := model.ByteReader{Data: record.Payload}
-	_, err := br.ReadStruct(dp)
+	err := br.ReadStruct(dp)
 	if err != nil {
 		return err
 	}

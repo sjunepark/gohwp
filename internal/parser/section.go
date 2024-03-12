@@ -41,7 +41,6 @@ func visitSection(record *model.Record, section *model.Section, ctx context.Cont
 	default:
 		return nil
 	}
-
 	return nil
 }
 
@@ -60,7 +59,7 @@ func visitParHeader(record *model.Record, section *model.Section, ctx context.Co
 	if (hwpVersion.Gte(model.HWPVersion{Major: 5, Build: 3, Revision: 2})) {
 		var paraHeaderV2 model.ParaHeader
 
-		_, err := br.ReadStruct(&paraHeaderV2)
+		err := br.ReadStruct(&paraHeaderV2)
 		if err != nil {
 			return err
 		}
@@ -68,11 +67,10 @@ func visitParHeader(record *model.Record, section *model.Section, ctx context.Co
 	} else {
 		var paraHeaderV1 model.ParaHeaderV1
 
-		_, err := br.ReadStruct(&paraHeaderV1)
+		err := br.ReadStruct(&paraHeaderV1)
 		if err != nil {
 			return err
 		}
-		// Q: Fix this
 		paraHeader = model.ParaHeader{ParaHeaderV1: paraHeaderV1, IsMergedTrack: nil}
 	}
 
@@ -109,27 +107,49 @@ func visitParaText(record *model.Record, section *model.Section) error {
 	br := model.ByteReader{Data: record.Payload} // Is size 80
 
 	currentPara := section.CurrentParagraph()
-	textLength := currentPara.ParaHeader.TextLength // Outputs 40
-
-	var paraText model.ParaText
-	var processedBytes int
+	textLength := currentPara.ParaHeader.TextLength
 	const textBytes = 2
 
-	for processedBytes <= int(textLength)*textBytes {
+	var paraText model.ParaText
+
+	bytesToRead := int(textLength) * textBytes
+	// WChar is uint16, which is 2 bytes
+	wCharBytes := 2
+
+	for bytesToRead > 0 {
 		var wChar model.WChar
-		offset, err := br.ReadStruct(&wChar)
+		err := br.ReadStruct(&wChar)
+		bytesToRead -= wCharBytes
 		if err != nil {
 			return err
 		}
-		processedBytes += offset
 
-		charType := wChar.CharType()
-		if charType == model.CharTypeInline || charType == model.CharTypeExtended {
-			err = br.Skip(14)
+		switch wChar.CharType() {
+		case model.CharTypeChar:
+			//	Nothing to skip
+		case model.CharTypeInline, model.CharTypeExtended:
+			// Inline and extended controls are 12 bytes long, with an additional equivalent ch at the end
+			bytesToSkip := 12
+			err := br.Skip(bytesToSkip)
 			if err != nil {
 				return err
 			}
+			bytesToRead -= bytesToSkip
+
+			var wCharEnd model.WChar
+			err = br.ReadStruct(&wCharEnd)
+			bytesToRead -= wCharBytes
+			if err != nil {
+				return err
+			}
+
+			if wChar != wCharEnd {
+				return fmt.Errorf("during parsing control characters, start and end characters do not match: %d, %d", wChar, wCharEnd)
+			}
+		default:
+			//	Nothing to skip
 		}
+
 		paraText = append(paraText, wChar)
 	}
 

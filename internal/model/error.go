@@ -1,4 +1,4 @@
-package _type
+package model
 
 import "fmt"
 

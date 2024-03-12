@@ -3,12 +3,34 @@ package model
 import (
 	"fmt"
 	"github.com/sjunepark/gohwp/internal/constant"
+	"strings"
 )
 
 type Record struct {
 	RecordHeader
 	Payload  []byte
 	Children []*Record
+}
+
+func (r *Record) String() string {
+	var prettyPrint func(*Record, int) string
+	prettyPrint = func(record *Record, indentLevel int) string {
+		indent := strings.Repeat("  ", indentLevel) // Creates an indentation string
+		var builder strings.Builder
+
+		// Append current record's information
+		builder.WriteString(fmt.Sprintf("%s%s\n", indent, record.RecordHeader.String()))
+
+		// Recursively append children's information, with increased indentation
+		for _, child := range record.Children {
+			builder.WriteString(prettyPrint(child, indentLevel+1))
+		}
+
+		return builder.String()
+	}
+
+	// Start the pretty print from the current record with no indentation
+	return prettyPrint(r, 0)
 }
 
 type RecordHeader struct {
