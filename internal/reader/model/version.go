@@ -73,9 +73,9 @@ type Attributes1 struct {
 	HasOrderFieldControl              bool // 차례 필드 컨트롤 포함 여부
 }
 
-func NewAttributes1(data []byte) (*Attributes1, error) {
+func NewAttributes1(data []byte) (Attributes1, error) {
 	if len(data) != 4 {
-		return nil, &ByteLengthError{
+		return Attributes1{}, &ByteLengthError{
 			ExpectedLength: 4,
 			ActualLength:   len(data),
 		}
@@ -85,10 +85,10 @@ func NewAttributes1(data []byte) (*Attributes1, error) {
 
 	// Check if rest(after 17) is invalid
 	if val&(0xFFFC0000) != 0 {
-		return nil, fmt.Errorf("bit 18~31 are reserved but has value")
+		return Attributes1{}, fmt.Errorf("bit 18~31 are reserved but has value")
 	}
 
-	return &Attributes1{
+	return Attributes1{
 		Compressed:                        val&0x01 != 0,
 		Encrypted:                         val&(1<<1) != 0,
 		Distribution:                      val&(1<<2) != 0,

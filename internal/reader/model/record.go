@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/sjunepark/gohwp/internal/constant"
+	"github.com/sjunepark/gohwp/internal/reader/constant"
 	"strings"
 )
 
@@ -43,7 +43,7 @@ func (rh *RecordHeader) String() string {
 	return fmt.Sprintf("TagID: %s, Level: %d, Size: %d", rh.TagID, rh.Level, rh.Size)
 }
 
-func ParseRecordTree(data []byte) (*Record, error) {
+func ReadRecordTree(data []byte) (*Record, error) {
 	br := &ByteReader{Data: data}
 
 	rootRecord := &Record{

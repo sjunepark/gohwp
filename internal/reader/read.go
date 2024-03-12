@@ -1,18 +1,18 @@
-package parser
+package reader
 
 import (
 	"context"
 	"fmt"
 	"github.com/richardlehane/mscfb"
-	"github.com/sjunepark/gohwp/internal/model"
+	"github.com/sjunepark/gohwp/internal/reader/model"
 	"os"
 	"strings"
 )
 
-func Parse(filePath string) error {
+func Read(filePath string) (doc *model.Document, encrypted bool, err error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return err
+		return &model.Document{}, false, err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
@@ -23,36 +23,43 @@ func Parse(filePath string) error {
 
 	reader, err := mscfb.New(file)
 	if err != nil {
-		return err
+		return &model.Document{}, false, err
 	}
 
-	doc := &model.HWPDocument{}
+	doc = &model.Document{}
+
 	documentData, err := getDocumentData(reader)
 	if err != nil {
-		return err
+		return &model.Document{}, false, err
 	}
 
-	h, err := getHeader(documentData.header)
+	header, err := getHeader(documentData.header)
 	if err != nil {
-		return err
+		return &model.Document{}, false, err
 	}
-	doc.Header = h
+	doc.Header = header
 	ctx := context.Background()
-	ctx = setVersion(ctx, h.Version)
+	ctx = setVersion(ctx, header.Version)
 
-	di, err := getDocInfo(documentData.docInfo)
-	if err != nil {
-		return err
+	// todo: test if this works for encrypted documents
+	// Early return when document is ed
+	if header.Attributes1.Encrypted {
+		return &model.Document{}, false, err
 	}
-	doc.DocInfo = di
 
-	s, err := getSections(documentData.bodyText, ctx)
+	docInfo, err := getDocInfo(documentData.docInfo)
 	if err != nil {
-		return err
+		return &model.Document{}, false, err
 	}
-	doc.BodyText = s
+	doc.DocInfo = docInfo
 
-	return nil
+	sections, err := getSections(documentData.bodyText, ctx)
+	if err != nil {
+		return &model.Document{}, false, err
+	}
+	doc.BodyText = sections
+
+	return doc, false, err
 }
 
 type documentData struct {
@@ -126,12 +133,12 @@ func getDocInfo(data []byte) (*model.DocInfo, error) {
 		return nil, err
 	}
 
-	docInfoParser, err := NewDocInfoParser(deCompressedData)
+	docInfoReader, err := NewDocInfoReader(deCompressedData)
 	if err != nil {
 		return nil, err
 	}
 
-	di, err := docInfoParser.Parse()
+	di, err := docInfoReader.Read()
 	if err != nil {
 		return nil, err
 	}
@@ -139,19 +146,19 @@ func getDocInfo(data []byte) (*model.DocInfo, error) {
 }
 
 func getSections(data []sectionData, ctx context.Context) ([]*model.Section, error) {
-	sections := make([]*model.Section, len(data))
+	sections := make([]*model.Section, 0, len(data))
 	for _, sectionData := range data {
 		deCompressedData, err := DecompressDeflate(sectionData)
 		if err != nil {
 			return nil, err
 		}
 
-		sectionParser, err := NewSectionParser(deCompressedData)
+		sectionReader, err := NewSectionReader(deCompressedData)
 		if err != nil {
 			return nil, err
 		}
 
-		s, err := sectionParser.Parse(ctx)
+		s, err := sectionReader.Read(ctx)
 		if err != nil {
 			return nil, err
 		}

@@ -6,9 +6,9 @@ import (
 )
 
 type HWPHeader struct {
-	Version     HWPVersion   `validate:"required"`
-	Signature   string       `validate:"required"`
-	Attributes1 *Attributes1 `validate:"required"`
+	Version     HWPVersion  `validate:"required"`
+	Signature   string      `validate:"required"`
+	Attributes1 Attributes1 `validate:"required"`
 }
 
 func NewHWPHeader(data []byte) (*HWPHeader, error) {

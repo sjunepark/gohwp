@@ -1,33 +1,32 @@
-package parser
+package reader
 
 import (
 	"context"
 	"fmt"
-	"github.com/sjunepark/gohwp/internal/constant"
-	"github.com/sjunepark/gohwp/internal/model"
+	"github.com/sjunepark/gohwp/internal/reader/constant"
+	"github.com/sjunepark/gohwp/internal/reader/model"
 )
 
-type SectionParser struct {
+type SectionReader struct {
 	record  *model.Record
 	section *model.Section
 }
 
-func NewSectionParser(data []byte) (*SectionParser, error) {
-	record, err := model.ParseRecordTree(data)
+func NewSectionReader(data []byte) (*SectionReader, error) {
+	record, err := model.ReadRecordTree(data)
 	if err != nil {
 		return nil, err
 	}
-	return &SectionParser{record: record, section: &model.Section{}}, nil
+	return &SectionReader{record: record, section: &model.Section{}}, nil
 }
 
-func (p *SectionParser) Parse(ctx context.Context) (*model.Section, error) {
+func (p *SectionReader) Read(ctx context.Context) (*model.Section, error) {
 	for _, child := range p.record.Children {
 		err := visitSection(child, p.section, ctx)
 		if err != nil {
 			return nil, err
 		}
 	}
-	fmt.Println(p.section)
 	return p.section, nil
 }
 
