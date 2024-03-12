@@ -4,8 +4,10 @@ type TagID uint16
 
 func (t TagID) String() {}
 
+//goland:noinspection GoUnusedConst,GoSnakeCaseUsage,GoCommentStart
 const HWPTAG_BEGIN TagID = 0x10
 
+//goland:noinspection GoUnusedConst,GoSnakeCaseUsage,GoCommentStart
 const (
 	// Tags for DocInfo
 	HWPTAG_DOCUMENT_PROPERTIES  TagID = HWPTAG_BEGIN
