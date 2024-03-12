@@ -1,4 +1,4 @@
-package models
+package model
 
 type DocInfo struct {
 	DocumentProperties  *DocumentProperties

@@ -1,7 +1,8 @@
-package models
+package model
 
 import (
 	"github.com/sjunepark/gohwp/internal/validator"
+	"unicode/utf16"
 )
 
 // A byte is 8 bits. Multibyte types in this context are stored in little-endian order.
@@ -55,6 +56,13 @@ func (wc WChar) CharType() CharType {
 
 	default: // 0-31 범위 내의 다른 컨트롤 문자들은 예약되어 있거나 특수한 용도로 사용됩니다.
 		// 이 경우에는 일반 문자(char)로 처리할 수 있습니다.
-		return CharTypeChar
+		return CharTypeDefault
 	}
+}
+
+func (wc WChar) String() string {
+	runeValue := rune(wc)
+	encoded := utf16.Encode([]rune{runeValue})
+	decodedRune := utf16.Decode(encoded)
+	return string(decodedRune)
 }

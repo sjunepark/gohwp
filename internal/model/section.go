@@ -1,4 +1,4 @@
-package models
+package model
 
 type Section struct {
 	Paragraphs []*Paragraph `validate:"required"`

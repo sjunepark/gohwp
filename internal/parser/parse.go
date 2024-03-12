@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/richardlehane/mscfb"
-	"github.com/sjunepark/gohwp/internal/models"
+	"github.com/sjunepark/gohwp/internal/model"
 	"os"
 	"strings"
 )
@@ -26,7 +26,7 @@ func Parse(filePath string) error {
 		return err
 	}
 
-	doc := &models.HWPDocument{}
+	doc := &model.HWPDocument{}
 	documentData, err := getDocumentData(reader)
 	if err != nil {
 		return err
@@ -102,8 +102,8 @@ func getData(reader *mscfb.Reader, size int64) ([]byte, error) {
 	return data, nil
 }
 
-func getHeader(data []byte) (*models.HWPHeader, error) {
-	header, err := models.NewHWPHeader(data)
+func getHeader(data []byte) (*model.HWPHeader, error) {
+	header, err := model.NewHWPHeader(data)
 	if err != nil {
 		return nil, err
 	}
@@ -113,14 +113,14 @@ func getHeader(data []byte) (*models.HWPHeader, error) {
 		return nil, fmt.Errorf("unsupported signature: %s", header.Signature)
 	}
 
-	supportedVersion := models.HWPVersion{Major: 5}
+	supportedVersion := model.HWPVersion{Major: 5}
 	if !header.Version.IsCompatible(supportedVersion) {
 		return nil, fmt.Errorf("unsupported version: %s", header.Version)
 	}
 	return header, nil
 }
 
-func getDocInfo(data []byte) (*models.DocInfo, error) {
+func getDocInfo(data []byte) (*model.DocInfo, error) {
 	deCompressedData, err := DecompressDeflate(data)
 	if err != nil {
 		return nil, err
@@ -138,8 +138,8 @@ func getDocInfo(data []byte) (*models.DocInfo, error) {
 	return di, nil
 }
 
-func getSections(data []sectionData, ctx context.Context) ([]*models.Section, error) {
-	sections := make([]*models.Section, len(data))
+func getSections(data []sectionData, ctx context.Context) ([]*model.Section, error) {
+	sections := make([]*model.Section, len(data))
 	for _, sectionData := range data {
 		deCompressedData, err := DecompressDeflate(sectionData)
 		if err != nil {

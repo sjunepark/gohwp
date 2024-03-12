@@ -1,9 +1,8 @@
-package models
+package model
 
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/sjunepark/gohwp/internal/types"
 )
 
 type HWPVersion struct {
@@ -17,7 +16,7 @@ func NewHWPVersion(data []byte) (HWPVersion, error) {
 	expectedLength := 4
 
 	if len(data) != expectedLength {
-		return HWPVersion{}, &types.ByteLengthError{
+		return HWPVersion{}, &ByteLengthError{
 			ExpectedLength: expectedLength,
 			ActualLength:   len(data),
 		}
@@ -76,7 +75,7 @@ type Attributes1 struct {
 
 func NewAttributes1(data []byte) (*Attributes1, error) {
 	if len(data) != 4 {
-		return nil, &types.ByteLengthError{
+		return nil, &ByteLengthError{
 			ExpectedLength: 4,
 			ActualLength:   len(data),
 		}

@@ -1,4 +1,4 @@
-package models
+package model
 
 type CharType int
 
@@ -6,9 +6,7 @@ const (
 	CharTypeChar CharType = iota
 	CharTypeInline
 	CharTypeExtended
+	CharTypeDefault
 )
 
-type HWPChar struct {
-	CharType
-	Value string
-}
+// todo: implement CharType as a struct with

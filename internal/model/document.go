@@ -1,4 +1,4 @@
-package models
+package model
 
 type HWPDocument struct {
 	Header   *HWPHeader `validate:"required"`

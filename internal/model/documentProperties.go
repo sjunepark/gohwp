@@ -1,4 +1,4 @@
-package models
+package model
 
 type DocumentProperties struct {
 	SectionSize uint16

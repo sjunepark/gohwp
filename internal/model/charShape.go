@@ -1,4 +1,4 @@
-package models
+package model
 
 type CharShape struct {
 	FontId           SupportedLocaleOptions
