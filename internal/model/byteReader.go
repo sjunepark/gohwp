@@ -3,6 +3,7 @@ package model
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/sjunepark/gohwp/internal/constant"
 	"github.com/sjunepark/gohwp/internal/type"
 	"github.com/sjunepark/gohwp/internal/validator"
 )
@@ -33,7 +34,7 @@ func (br *ByteReader) readRecordHeader() (*RecordHeader, error) {
 		return nil, err
 	}
 	header := &RecordHeader{
-		TagID: uint32(dWord & 0x3FF),
+		TagID: constant.TagID(dWord & 0x3FF),
 		Level: uint32((dWord >> 10) & 0x3FF),
 		Size:  uint32((dWord >> 20) & 0xFFF),
 	}

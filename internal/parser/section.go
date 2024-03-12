@@ -33,7 +33,7 @@ func (p *SectionParser) Parse(ctx context.Context) (*model.Section, error) {
 
 func visitSection(record *model.Record, section *model.Section, ctx context.Context) error {
 	switch record.TagID {
-	case constant.SECTION_HWPTAG_PARA_HEADER:
+	case constant.HWPTAG_PARA_HEADER:
 		err := visitParHeader(record, section, ctx)
 		if err != nil {
 			return err
@@ -93,7 +93,7 @@ func visitParHeader(record *model.Record, section *model.Section, ctx context.Co
 
 func visitParaElem(record *model.Record, section *model.Section, ctx context.Context) error {
 	switch record.TagID {
-	case constant.SECTION_HWPTAG_PARA_TEXT:
+	case constant.HWPTAG_PARA_TEXT:
 		err := visitParaText(record, section)
 		if err != nil {
 			return err

@@ -30,7 +30,7 @@ func (p *DocInfoParser) Parse() (*model.DocInfo, error) {
 
 func visitDocInfo(record *model.Record, docInfo *model.DocInfo) error {
 	switch record.TagID {
-	case constant.DOCINFO_HWPTAG_DOCUMENT_PROPERTIES:
+	case constant.HWPTAG_DOCUMENT_PROPERTIES:
 		err := visitDocumentProperties(record, docInfo)
 		if err != nil {
 			return err
