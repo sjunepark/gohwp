@@ -1,5 +1,7 @@
 package model
 
+import "github.com/sjunepark/gohwp/internal/util"
+
 type Section struct {
 	Paragraphs []*Paragraph
 }
@@ -9,12 +11,5 @@ func (s *Section) CurrentParagraph() *Paragraph {
 }
 
 func (s *Section) String() string {
-	var str string
-	for i, para := range s.Paragraphs {
-		if i > 0 {
-			str += "\n" // Add a newline before each paragraph except the first one
-		}
-		str += para.String()
-	}
-	return str
+	return util.JoinStringers(s.Paragraphs, "\n")
 }

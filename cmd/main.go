@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/sjunepark/gohwp/internal/parser"
 	"github.com/sjunepark/gohwp/internal/reader"
 	"log/slog"
 	"os"
@@ -17,7 +18,7 @@ func init() {
 func main() {
 	initSlog()
 
-	doc, encrypted, err := reader.Read("data/example.hwp")
+	raw, encrypted, err := reader.Read("data/example.hwp")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -25,9 +26,8 @@ func main() {
 		fmt.Println("Document is encrypted")
 	}
 
-	for _, section := range doc.BodyText {
-		fmt.Println(section)
-	}
+	doc := parser.Parse(raw)
+	fmt.Println(doc)
 }
 
 func initSlog() {
