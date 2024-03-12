@@ -18,7 +18,7 @@ type RecordHeader struct {
 }
 
 func (rh *RecordHeader) String() string {
-	return fmt.Sprintf("TagID: %d, Level: %d, Size: %d", rh.TagID, rh.Level, rh.Size)
+	return fmt.Sprintf("TagID: %s, Level: %d, Size: %d", rh.TagID, rh.Level, rh.Size)
 }
 
 func ParseRecordTree(data []byte) (*Record, error) {
