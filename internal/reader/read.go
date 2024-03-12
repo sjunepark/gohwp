@@ -32,25 +32,25 @@ func Read(filePath string) error {
 		return err
 	}
 
-	h, err := getHeader(documentData.header)
+	header, err := getHeader(documentData.header)
 	if err != nil {
 		return err
 	}
-	doc.Header = h
+	doc.Header = header
 	ctx := context.Background()
-	ctx = setVersion(ctx, h.Version)
+	ctx = setVersion(ctx, header.Version)
 
-	di, err := getDocInfo(documentData.docInfo)
+	docInfo, err := getDocInfo(documentData.docInfo)
 	if err != nil {
 		return err
 	}
-	doc.DocInfo = di
+	doc.DocInfo = docInfo
 
-	s, err := getSections(documentData.bodyText, ctx)
+	sections, err := getSections(documentData.bodyText, ctx)
 	if err != nil {
 		return err
 	}
-	doc.BodyText = s
+	doc.BodyText = sections
 
 	return nil
 }
