@@ -1,4 +1,4 @@
-package models
+package model
 
 func getBitValue(value int, start int, end int) uint8 {
 	return uint8((value >> start) & ((1 << (end - start + 1)) - 1))

@@ -2,16 +2,16 @@ package parser
 
 import (
 	"context"
-	"github.com/sjunepark/gohwp/internal/models"
+	"github.com/sjunepark/gohwp/internal/model"
 )
 
 const versionKey = "hwpVersion"
 
-func setVersion(ctx context.Context, version models.HWPVersion) context.Context {
+func setVersion(ctx context.Context, version model.HWPVersion) context.Context {
 	return context.WithValue(ctx, versionKey, version)
 }
 
-func getVersion(ctx context.Context) (models.HWPVersion, bool) {
-	v, ok := ctx.Value(versionKey).(models.HWPVersion)
+func getVersion(ctx context.Context) (model.HWPVersion, bool) {
+	v, ok := ctx.Value(versionKey).(model.HWPVersion)
 	return v, ok
 }

@@ -1,4 +1,4 @@
-package constants
+package constant
 
 const HWPTAG_BEGIN = 0x10
 

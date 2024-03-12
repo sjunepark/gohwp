@@ -1,4 +1,4 @@
-package models
+package model
 
 type LineSegment struct {
 	Start       int
