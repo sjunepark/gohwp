@@ -1,7 +1,7 @@
 package model
 
 type Section struct {
-	Paragraphs []*Paragraph `validate:"required"`
+	Paragraphs []*Paragraph
 }
 
 func (s *Section) CurrentParagraph() *Paragraph {

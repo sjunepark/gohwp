@@ -17,9 +17,16 @@ func init() {
 func main() {
 	initSlog()
 
-	err := reader.Read("data/example.hwp")
+	doc, encrypted, err := reader.Read("data/example.hwp")
 	if err != nil {
 		fmt.Println(err)
+	}
+	if encrypted {
+		fmt.Println("Document is encrypted")
+	}
+
+	for _, section := range doc.BodyText {
+		fmt.Println(section)
 	}
 }
 

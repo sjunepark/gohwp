@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-func Read(filePath string) error {
+func Read(filePath string) (doc *model.HWPDocument, encrypted bool, err error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return err
+		return &model.HWPDocument{}, false, err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
@@ -23,36 +23,43 @@ func Read(filePath string) error {
 
 	reader, err := mscfb.New(file)
 	if err != nil {
-		return err
+		return &model.HWPDocument{}, false, err
 	}
 
-	doc := &model.HWPDocument{}
+	doc = &model.HWPDocument{}
+
 	documentData, err := getDocumentData(reader)
 	if err != nil {
-		return err
+		return &model.HWPDocument{}, false, err
 	}
 
 	header, err := getHeader(documentData.header)
 	if err != nil {
-		return err
+		return &model.HWPDocument{}, false, err
 	}
 	doc.Header = header
 	ctx := context.Background()
 	ctx = setVersion(ctx, header.Version)
 
+	// todo: test if this works for encrypted documents
+	// Early return when document is ed
+	if header.Attributes1.Encrypted {
+		return &model.HWPDocument{}, false, err
+	}
+
 	docInfo, err := getDocInfo(documentData.docInfo)
 	if err != nil {
-		return err
+		return &model.HWPDocument{}, false, err
 	}
 	doc.DocInfo = docInfo
 
 	sections, err := getSections(documentData.bodyText, ctx)
 	if err != nil {
-		return err
+		return &model.HWPDocument{}, false, err
 	}
 	doc.BodyText = sections
 
-	return nil
+	return doc, false, err
 }
 
 type documentData struct {
@@ -139,7 +146,7 @@ func getDocInfo(data []byte) (*model.DocInfo, error) {
 }
 
 func getSections(data []sectionData, ctx context.Context) ([]*model.Section, error) {
-	sections := make([]*model.Section, len(data))
+	sections := make([]*model.Section, 0, len(data))
 	for _, sectionData := range data {
 		deCompressedData, err := DecompressDeflate(sectionData)
 		if err != nil {

@@ -27,7 +27,6 @@ func (p *SectionReader) Read(ctx context.Context) (*model.Section, error) {
 			return nil, err
 		}
 	}
-	fmt.Println(p.section)
 	return p.section, nil
 }
 
