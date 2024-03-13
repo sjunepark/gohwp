@@ -7,7 +7,7 @@ import (
 
 const versionKey = "hwpVersion"
 
-func setVersion(ctx context.Context, version model.HWPVersion) context.Context {
+func SetVersion(ctx context.Context, version model.HWPVersion) context.Context {
 	return context.WithValue(ctx, versionKey, version)
 }
 

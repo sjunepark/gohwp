@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/richardlehane/mscfb"
+	"github.com/sjunepark/hwp/internal/reader"
 	"github.com/sjunepark/hwp/internal/reader/model"
 	"os"
 	"strings"
@@ -21,14 +22,14 @@ func Read(filePath string) (doc *model.Document, encrypted bool, err error) {
 		}
 	}(file)
 
-	reader, err := mscfb.New(file)
+	mscfbReader, err := mscfb.New(file)
 	if err != nil {
 		return &model.Document{}, false, err
 	}
 
 	doc = &model.Document{}
 
-	documentData, err := getDocumentData(reader)
+	documentData, err := getDocumentData(mscfbReader)
 	if err != nil {
 		return &model.Document{}, false, err
 	}
@@ -39,7 +40,7 @@ func Read(filePath string) (doc *model.Document, encrypted bool, err error) {
 	}
 	doc.Header = header
 	ctx := context.Background()
-	ctx = setVersion(ctx, header.Version)
+	ctx = reader.SetVersion(ctx, header.Version)
 
 	// todo: test if this works for encrypted documents
 	// Early return when document is ed
@@ -128,12 +129,12 @@ func getHeader(data []byte) (*model.HWPHeader, error) {
 }
 
 func getDocInfo(data []byte) (*model.DocInfo, error) {
-	deCompressedData, err := DecompressDeflate(data)
+	deCompressedData, err := reader.DecompressDeflate(data)
 	if err != nil {
 		return nil, err
 	}
 
-	docInfoReader, err := NewDocInfoReader(deCompressedData)
+	docInfoReader, err := reader.NewDocInfoReader(deCompressedData)
 	if err != nil {
 		return nil, err
 	}
@@ -148,12 +149,12 @@ func getDocInfo(data []byte) (*model.DocInfo, error) {
 func getSections(data []sectionData, ctx context.Context) ([]*model.Section, error) {
 	sections := make([]*model.Section, 0, len(data))
 	for _, sectionData := range data {
-		deCompressedData, err := DecompressDeflate(sectionData)
+		deCompressedData, err := reader.DecompressDeflate(sectionData)
 		if err != nil {
 			return nil, err
 		}
 
-		sectionReader, err := NewSectionReader(deCompressedData)
+		sectionReader, err := reader.NewSectionReader(deCompressedData)
 		if err != nil {
 			return nil, err
 		}
