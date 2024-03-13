@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/sjunepark/gohwp/internal/validator"
+	"github.com/sjunepark/hwp/internal/validator"
 	"unicode/utf16"
 )
 

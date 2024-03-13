@@ -3,8 +3,8 @@ package model
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/sjunepark/gohwp/internal/reader/constant"
-	"github.com/sjunepark/gohwp/internal/validator"
+	"github.com/sjunepark/hwp/internal/reader/constant"
+	"github.com/sjunepark/hwp/internal/validator"
 )
 
 type ByteReader struct {

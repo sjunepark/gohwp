@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"github.com/sjunepark/gohwp/internal/parser/model"
-	raw "github.com/sjunepark/gohwp/internal/reader/model"
+	"github.com/sjunepark/hwp/internal/parser/model"
+	raw "github.com/sjunepark/hwp/internal/reader/model"
 )
 
 func Parse(r *raw.Document) *model.Document {

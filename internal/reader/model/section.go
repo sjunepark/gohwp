@@ -1,6 +1,6 @@
 package model
 
-import "github.com/sjunepark/gohwp/internal/util"
+import "github.com/sjunepark/hwp/internal/util"
 
 type Section struct {
 	Paragraphs []*Paragraph

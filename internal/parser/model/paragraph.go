@@ -1,6 +1,6 @@
 package model
 
-import raw "github.com/sjunepark/gohwp/internal/reader/model"
+import raw "github.com/sjunepark/hwp/internal/reader/model"
 
 type Paragraph struct {
 	ParaText string

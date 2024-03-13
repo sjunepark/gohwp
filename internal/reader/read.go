@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/richardlehane/mscfb"
-	"github.com/sjunepark/gohwp/internal/reader/model"
+	"github.com/sjunepark/hwp/internal/reader/model"
 	"os"
 	"strings"
 )

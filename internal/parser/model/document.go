@@ -1,8 +1,8 @@
 package model
 
 import (
-	raw "github.com/sjunepark/gohwp/internal/reader/model"
-	"github.com/sjunepark/gohwp/internal/util"
+	raw "github.com/sjunepark/hwp/internal/reader/model"
+	"github.com/sjunepark/hwp/internal/util"
 )
 
 type Document struct {

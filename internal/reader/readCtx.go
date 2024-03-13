@@ -2,7 +2,7 @@ package reader
 
 import (
 	"context"
-	"github.com/sjunepark/gohwp/internal/reader/model"
+	"github.com/sjunepark/hwp/internal/reader/model"
 )
 
 const versionKey = "hwpVersion"

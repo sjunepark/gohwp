@@ -1,4 +1,4 @@
-module github.com/sjunepark/gohwp
+module github.com/sjunepark/hwp
 
 go 1.22.0
 

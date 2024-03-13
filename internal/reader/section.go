@@ -3,8 +3,8 @@ package reader
 import (
 	"context"
 	"fmt"
-	"github.com/sjunepark/gohwp/internal/reader/constant"
-	"github.com/sjunepark/gohwp/internal/reader/model"
+	"github.com/sjunepark/hwp/internal/reader/constant"
+	"github.com/sjunepark/hwp/internal/reader/model"
 )
 
 type SectionReader struct {

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	"github.com/sjunepark/gohwp/internal/parser"
-	"github.com/sjunepark/gohwp/internal/reader"
+	"github.com/sjunepark/hwp/internal/parser"
+	"github.com/sjunepark/hwp/internal/reader"
 	"log/slog"
 	"os"
 )

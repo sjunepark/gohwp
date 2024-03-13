@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/sjunepark/gohwp/internal/reader/constant"
+	"github.com/sjunepark/hwp/internal/reader/constant"
 	"strings"
 )
 
