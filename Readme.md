@@ -1,6 +1,6 @@
 # hwp
 
-> 한글과컴퓨터 문서(`.hwp`)와 상호작용하기 위한 Library 입니다.
+> 한글과컴퓨터 문서(`.hwp`)와 상호작용하기 위한 Golang Library 입니다.
 
 ## 설치
 
@@ -15,9 +15,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/sjunepark/hwp"
-	"github.com/sjunepark/hwp/internal/parser"
-	"github.com/sjunepark/hwp/internal/reader"
+	"github.com/sjunepark/hwp/pkg/parser"
+	"github.com/sjunepark/hwp/pkg/reader"
 )
 
 func main() {
@@ -28,7 +27,8 @@ func main() {
 	if encrypted {
 		fmt.Println("Document is encrypted")
 	}
+
+	doc := parser.Parse(raw)
+	fmt.Println(doc)
 }
-
-
 ```
