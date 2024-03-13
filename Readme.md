@@ -1,6 +1,6 @@
 # hwp
 
-> 한글과컴퓨터 문서(`.hwp`)와 상호작용하기 위한 Golang Library 입니다.
+한글과컴퓨터 문서(`.hwp`)와 상호작용하기 위한 Golang Library 입니다.
 
 ## 설치
 
